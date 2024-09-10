@@ -2,6 +2,8 @@
 #author: rangapv@yahoo.com
 #TO-RUN: ./step.sh
 
+#set -e
+
 appkill() {
 
 argarray=("$@")
@@ -65,12 +67,20 @@ fi
 appkill file1.txt app
 
 #getting todays date and making a backup of the https app to be restored after certificate success
+# Copy only once
 
 filext=`date +%d-%m-%g`
-s5=`cp ./app.js ./app.js.($filext)`
-s5s="$?"
 
-if  [ "$s5s" == "0" ]
+if [ -z app.js.${filext} ]
+then
+s5=`cp ./app.js ./app.js.${filext}`
+s5s="$?"
+else
+echo "the file app.js.${filext} already backedup"
+fi
+
+
+if  [ ! -z app.js.${filext} ]
 then
   echo "The default certificate app is copied to namesake app.js"
   s6=`cp ./app.js.bkp2.certrenewalfile ./app.js`
@@ -78,7 +88,7 @@ then
 
   if [ "$s6s" == "0" ]
   then
-    s7=`sudo node app.js 2>&1 > /dev/null`
+    s7=`sudo node app.js 2>&1 > /dev/null &`
     s7s="$?"
   fi
 
@@ -88,19 +98,18 @@ then
       s8s="$?"
   fi
 
-  if [ "$s8" -gt "1" ] && [ "$s8s" == "0" ]
+  if [ "$s8" -gt 1 ] && [ "$s8s" == "0" ]
   then
       echo "The app with just http and NO-REDIRECTS is up-running so lets start the license-BOT"
       domain="vetrisoft.in"
       path2c="/home/ubuntu/node2/public"
-      s9=`sudo certbot certonly --webroot -w $path2c -d $domain > certrenew-output.txt`
+      s9=`sudo certbot certonly --webroot --webroot-path ${path2c} -d ${domain} > certrenew-output.txt`
       s9s="$?"
       
       if [ "$s9s" == "0" ]
       then
-        echo "Certifcates Generated Successfully"
+        echo "Certificates Generated Successfully"
       fi
-
   fi
 
 fi
@@ -111,12 +120,12 @@ if [ "s9s" == "0" ] && [ ! -z ./certrenew-output.txt ]
 then
 
 appkill file2.txt app
-s10=`cp ./app.js.($filext) ./app.js`
+s10=`cp ./app.js.https ./app.js`
 s10s="$?"
 
   if [ "$s10s" == "0" ] 
   then
-    s11=`sudo node app.js 2>&1 > /dev/null`
+    s11=`sudo node app.js 2>&1 > /dev/null &`
     s11s="$?"
   fi
 
