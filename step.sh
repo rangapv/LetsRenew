@@ -85,14 +85,15 @@ then
   echo "The default certificate app is copied to namesake app.js"
   s6=`cp ./app.js.bkp2.certrenewalfile ./app.js`
   s6s="$?" 
+  echo "s6s is $s6s"
 
   if [ "$s6s" == "0" ]
   then
-    s7=`sudo node app.js 2>&1 > /dev/null &`
+    s7=`sudo node app.js >> nodelog  &`
     s7s="$?"
   fi
 
-  if  [ "$s7s" == "0" ]
+  if [ "$s7s" == "0" ]
   then
       s8=`ps -ef |grep -v grep | grep app | wc -l`    
       s8s="$?"
@@ -103,7 +104,8 @@ then
       echo "The app with just http and NO-REDIRECTS is up-running so lets start the license-BOT"
       domain="vetrisoft.in"
       path2c="/home/ubuntu/node2/public"
-      s9=`sudo certbot certonly --webroot --webroot-path ${path2c} -d ${domain} > certrenew-output.txt`
+      #s9=`sudo certbot certonly --webroot --webroot-path ${path2c} -d ${domain} > certrenew-output.txt`
+      s9=`sudo certbot certonly --webroot --webroot-path ${path2c} -d ${domain} >> certrenew-output.txt`
       s9s="$?"
       
       if [ "$s9s" == "0" ]
@@ -116,7 +118,7 @@ fi
 
 #Now if the certiface renewal is success then lets swap back the http app.js with our already saved https namesake app
 
-if [ "s9s" == "0" ] && [ ! -z ./certrenew-output.txt ]
+if [ ! -z ./certrenew-output.txt ]
 then
 
 appkill file2.txt app
@@ -125,7 +127,7 @@ s10s="$?"
 
   if [ "$s10s" == "0" ] 
   then
-    s11=`sudo node app.js 2>&1 > /dev/null &`
+    s11=`nohup sudo node app.js >> nodelog1  &`
     s11s="$?"
   fi
 
