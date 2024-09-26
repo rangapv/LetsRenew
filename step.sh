@@ -49,16 +49,12 @@ fi
 
 }
 
-
-
-
-
-
 chklis() {
+filex1t=`date +%d-%m-%g`
 
 s1=`sudo certbot certificates | grep "VALID" | grep -o "[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" `
 s11=`date -d ${s1} +%s`
-s2=`echo $filext | date +%s`
+s2=`echo $filex1t | date +%s`
 
 
 if (( ("$s11>=$s2" | bc -l) ))
@@ -87,12 +83,45 @@ fi
 
 }
 
+
+
+dependsit() {
+
+echo "Checking to see if you have \"bc\" and \"certbot\" installed in the box"
+
+chkifinsta bc certbot
+
+}
+
+chkifinsta() {
+
+cmd1=("$@")
+tcmd="$#"
+
+
+for i in "${cmd1[@]}"
+do
+
+wc=`which $i`
+wcs="$?"
+
+if [[ ( $wcs = "0" ) ]]
+then
+    echo "\"$i\" is installed proceeding with other checks"
+else
+    echo "\"$i\"  is not installed .pls install it and then re-run this script for other tasks"
+fi
+
+done
+
+
+}
+
 #main begins here
 
-
+dependsit
 
 chklis
-
 
 #echo checks to see the real need to license renewal and prceeds from here on
 
