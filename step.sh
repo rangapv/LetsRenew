@@ -50,7 +50,51 @@ fi
 }
 
 
+
+
+
+
+chklis() {
+
+s1=`sudo certbot certificates | grep "VALID" | grep -o "[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" `
+s11=`date -d ${s1} +%s`
+s2=`echo $filext | date +%s`
+
+
+if (( ("$s11>=$s2" | bc -l) ))
+then
+   echo "license is still valid"
+   diff=`echo "$s11-$s2" | bc -l`
+    sec=86400
+   days1=`echo "$diff / $sec" | bc`
+   echo "days left to renew is \"$days1\" or on \"$s1\""
+
+   echo "press \"y\" key to still renew"
+   read input
+
+   if [ "$input" == "y" ]
+   then
+     echo "continuing to renew license"
+   else
+     echo "Pressed key is negative to renewing exiting..."
+      exit
+   fi
+
+else
+   echo "license needs renewal"
+fi
+
+
+}
+
 #main begins here
+
+
+
+chklis
+
+
+#echo checks to see the real need to license renewal and prceeds from here on
 
 s1=`crontab -l`
 s1s="$?"
