@@ -4,7 +4,6 @@
 
 #set -e
 
-
 homedir="/home/ubuntu/node2"
 domain="vetrisoft.in"
 path2c="/home/ubuntu/node2/public"
@@ -136,13 +135,10 @@ fi
 
 }
 
-#main begins here
-
-dependsit
-
-chklis
 
 #echo checks to see the real need to license renewal and prceeds from here on
+
+renewBegin() {
 
 s1=`crontab -l`
 s1s="$?"
@@ -229,4 +225,13 @@ then
    echo "License Renewal is a Success check the domain $domain on a Browser to verify!"
 fi
 
-#
+}
+
+#main begins here
+
+dependsit
+
+chklis
+
+renewBegin
+
