@@ -4,6 +4,11 @@
 
 #set -e
 
+
+homedir="/home/ubuntu/node2"
+domain="vetrisoft.in"
+path2c="/home/ubuntu/node2/public"
+
 appkill() {
 
 argarray=("$@")
@@ -71,6 +76,13 @@ then
    if [ "$input" == "y" ]
    then
      echo "continuing to renew license"
+     if (( ("$days1>31" | bc-l )  ))
+     then
+       earlyd=`date --date="${s1} 30 day ago" +%y-%m-%d`
+       echo "Letsencrypt license can be renewed at the most 30 days in advance , current license is valid for another \"$days1\" days, \\n the earliest renewal day would be on \"${earlyd}\". \\n .exiting this script"
+       exit
+     fi
+
    else
      echo "Pressed key is negative to renewing exiting..."
       exit
@@ -80,9 +92,7 @@ else
    echo "license needs renewal"
 fi
 
-
 }
-
 
 
 dependsit() {
@@ -118,13 +128,11 @@ fi
 
 done
 
-
 if (( $insdep == 1 ))
 then
-   echo "Install all the dependecies and procedd aftetr, exiting now"
+   echo "Install all the dependencies and proceed after, exiting now"
    exit
 fi
-
 
 }
 
@@ -157,7 +165,7 @@ filext=`date +%d-%m-%g`
 
 if [ -z app.js.${filext} ]
 then
-s5=`cp ./app.js ./app.js.${filext}`
+s5=`cp $[homedir}/app.js ${homedir}/app.js.${filext}`
 s5s="$?"
 else
 echo "the file app.js.${filext} already backedup"
@@ -167,13 +175,13 @@ fi
 if  [ ! -z app.js.${filext} ]
 then
   echo "The default certificate app is copied to namesake app.js"
-  s6=`cp ./app.js.bkp2.certrenewalfile ./app.js`
+  s6=`cp ${homedir}/app.js.bkp2.certrenewalfile ${homedir}/app.js`
   s6s="$?" 
   echo "s6s is $s6s"
 
   if [ "$s6s" == "0" ]
   then
-    s7=`sudo node app.js >> nodelog  &`
+    s7=`sudo node ${homedir}/app.js >> nodelog  &`
     s7s="$?"
   fi
 
@@ -186,8 +194,6 @@ then
   if [ "$s8" -gt 1 ] && [ "$s8s" == "0" ]
   then
       echo "The app with just http and NO-REDIRECTS is up-running so lets start the license-BOT"
-      domain="vetrisoft.in"
-      path2c="/home/ubuntu/node2/public"
       #s9=`sudo certbot certonly --webroot --webroot-path ${path2c} -d ${domain} > certrenew-output.txt`
       s9=`sudo certbot certonly --webroot --webroot-path ${path2c} -d ${domain} >> certrenew-output.txt`
       s9s="$?"
@@ -206,12 +212,12 @@ if [ ! -z ./certrenew-output.txt ]
 then
 
 appkill file2.txt app
-s10=`cp ./app.js.https ./app.js`
+s10=`cp ${homedir}/app.js.https ${homedir}/app.js`
 s10s="$?"
 
   if [ "$s10s" == "0" ] 
   then
-    s11=`nohup sudo node app.js >> nodelog1  &`
+    s11=`nohup sudo node ${homedir}/app.js >> nodelog1  &`
     s11s="$?"
   fi
 
