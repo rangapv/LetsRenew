@@ -7,6 +7,7 @@
 homedir="/home/ubuntu/node2"
 domain="vetrisoft.in"
 path2c="/home/ubuntu/node2/public"
+globalk="0"
 
 appkill() {
 
@@ -57,11 +58,12 @@ chklis() {
 filex1t=`date +%d-%m-%g`
 
 s1=`sudo certbot certificates | grep "VALID" | grep -o "[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" `
+s1s="$?"
 s11=`date -d ${s1} +%s`
 s2=`echo $filex1t | date +%s`
 
 
-if (( ("$s11>=$s2" | bc -l) ))
+if (( ("$s11>=$s2" | bc -l) )) && [ "$s1s" == "0" ]
 then
    echo "license is still valid"
    diff=`echo "$s11-$s2" | bc -l`
@@ -75,8 +77,10 @@ then
    if [ "$input" == "y" ]
    then
      echo "continuing to renew license"
-     if (( ("$days1>31" | bc-l )  ))
+     if (( ( $days1 > 31 | bc -l ) )) && [ "$s1s" == "0" ]
+     # if (( ("$days1>31" | bc-l )  ))
      then
+       globalk="1"
        earlyd=`date --date="${s1} 30 day ago" +%y-%m-%d`
        echo "Letsencrypt license can be renewed at the most 30 days in advance , current license is valid for another \"$days1\" days, \\n the earliest renewal day would be on \"${earlyd}\". \\n .exiting this script"
        exit
@@ -139,6 +143,11 @@ fi
 #echo checks to see the real need to license renewal and prceeds from here on
 
 renewBegin() {
+
+if [ "$globalk" == "1" ]
+then
+   exit
+fi
 
 s1=`crontab -l`
 s1s="$?"
