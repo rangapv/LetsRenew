@@ -87,6 +87,7 @@ then
      fi
 
    else
+     globalk="1"
      echo "Pressed key is negative to renewing exiting..."
       exit
    fi
@@ -146,18 +147,19 @@ renewBegin() {
 
 if [ "$globalk" == "1" ]
 then
+
    exit
-fi
 
-s1=`crontab -l`
-s1s="$?"
+else
 
-if [ "$s1s" == "0" ] && [ ! -z "$s1" ]
+sc=`crontab -l`
+scs="$?"
+
+if [ "$scs" == "0" ] && [ ! -z "$sc" ]
 then
   s2=`crontab -r`
   s2s="$?"
 fi
-
 
 #Preparing for current app to be stopped for licnese fetch with backup app with only http and NO-REDIRECTS
 
@@ -231,7 +233,10 @@ fi
 
 if [ "$s11s" == "0" ]
 then
-   echo "License Renewal is a Success check the domain $domain on a Browser to verify!"
+   echo "License Renewal is a Success check the domain \"$domain\" on a Browser to verify!"
+fi
+
+
 fi
 
 }
