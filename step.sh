@@ -234,6 +234,13 @@ s10s="$?"
     s11s="$?"
   fi
 
+  #setting up the crontab for making sure app is running round the clock.Also removes duplicates....
+  if [ "$s11s" == "0" ]
+  then
+    s12=`( crontab -l | grep -v -F /home/ubuntu/secondrunthis.sh ; echo "* * * * * /home/ubuntu/secondrunthis.sh" ) | crontab -`
+    s12s="$?"
+  fi
+
 fi
 
 if [ "$s11s" == "0" ]
