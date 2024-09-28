@@ -9,6 +9,8 @@ domain="vetrisoft.in"
 path2c="/home/ubuntu/node2/public"
 globalk="0"
 
+#This method is to stop the runnign app which has https forwards and then load the plain http app version
+
 appkill() {
 
 argarray=("$@")
@@ -17,7 +19,6 @@ file1="${argarray[0]}"
 app="${argarray[1]}"
 s3=`ps -ef |grep -v grep | grep app > $file1`
 s3s="$?"
-#echo "s3s is $s3s"
 #echo "the output is $s3"
 count=0
 
@@ -54,6 +55,8 @@ fi
 
 }
 
+#This method is to check license validity and the days there-of....
+
 chklis() {
 filex1t=`date +%d-%m-%g`
 
@@ -62,12 +65,17 @@ s1s="$?"
 s11=`date -d ${s1} +%s`
 s2=`echo $filex1t | date +%s`
 
+if [ "$s1s" != "0" ]
+then
+  echo "This box does not have certbot license already issued, this Script is only for existing license renewal on or slighly before expiry..Hence exiting.."
+exit
+fi
 
 if (( ("$s11>=$s2" | bc -l) )) && [ "$s1s" == "0" ]
 then
    echo "license is still valid"
    diff=`echo "$s11-$s2" | bc -l`
-    sec=86400
+   sec=86400
    days1=`echo "$diff / $sec" | bc`
    echo "days left to renew is \"$days1\" or on \"$s1\""
 
@@ -77,6 +85,7 @@ then
    if [ "$input" == "y" ]
    then
      echo "continuing to renew license"
+
      if (( ( $days1 > 31 | bc -l ) )) && [ "$s1s" == "0" ]
      # if (( ("$days1>31" | bc-l )  ))
      then
@@ -89,7 +98,7 @@ then
    else
      globalk="1"
      echo "Pressed key is negative to renewing exiting..."
-      exit
+     exit
    fi
 
 else
@@ -97,7 +106,6 @@ else
 fi
 
 }
-
 
 dependsit() {
 
@@ -121,7 +129,6 @@ do
 wc=`which $i`
 wcs="$?"
 
-
 if [[ ( $wcs == "0" ) ]]
 then
     echo "\"$i\" is installed proceeding with other checks"
@@ -140,8 +147,7 @@ fi
 
 }
 
-
-#echo checks to see the real need to license renewal and prceeds from here on
+#This method is to license renewal and prceeds from here on
 
 renewBegin() {
 
@@ -161,7 +167,7 @@ then
   s2s="$?"
 fi
 
-#Preparing for current app to be stopped for licnese fetch with backup app with only http and NO-REDIRECTS
+#Preparing for current app to be stopped for license fetch with backup app with only http and NO-REDIRECTS
 
 appkill file1.txt app
 
@@ -170,21 +176,21 @@ appkill file1.txt app
 
 filext=`date +%d-%m-%g`
 
-if [ -z app.js.${filext} ]
+if [ -z ${homedir}/app.js.${filext} ]
 then
 s5=`cp $[homedir}/app.js ${homedir}/app.js.${filext}`
 s5s="$?"
 else
+t=1
 echo "the file app.js.${filext} already backedup"
 fi
 
-
-if  [ ! -z app.js.${filext} ]
+if [ ! -z ${homedir}/app.js.${filext} ]
 then
   echo "The default certificate app is copied to namesake app.js"
   s6=`cp ${homedir}/app.js.bkp2.certrenewalfile ${homedir}/app.js`
   s6s="$?" 
-  echo "s6s is $s6s"
+#  echo "s6s is $s6s"
 
   if [ "$s6s" == "0" ]
   then
@@ -198,11 +204,11 @@ then
       s8s="$?"
   fi
 
-  if [ "$s8" -gt 1 ] && [ "$s8s" == "0" ]
+  if (( "$s8" -gt 1 )) && [ "$s8s" == "0" ]
   then
       echo "The app with just http and NO-REDIRECTS is up-running so lets start the license-BOT"
       #s9=`sudo certbot certonly --webroot --webroot-path ${path2c} -d ${domain} > certrenew-output.txt`
-      s9=`sudo certbot certonly --webroot --webroot-path ${path2c} -d ${domain} >> certrenew-output.txt`
+      s9=`sudo certbot certonly --webroot --webroot-path ${path2c} -d ${domain} >> ${homedir}/certrenew-output.txt`
       s9s="$?"
       
       if [ "$s9s" == "0" ]
@@ -215,7 +221,7 @@ fi
 
 #Now if the certiface renewal is success then lets swap back the http app.js with our already saved https namesake app
 
-if [ ! -z ./certrenew-output.txt ]
+if [ ! -z ${homedir}/certrenew-output.txt ]
 then
 
 appkill file2.txt app
@@ -230,12 +236,10 @@ s10s="$?"
 
 fi
 
-
 if [ "$s11s" == "0" ]
 then
    echo "License Renewal is a Success check the domain \"$domain\" on a Browser to verify!"
 fi
-
 
 fi
 
@@ -249,3 +253,4 @@ chklis
 
 renewBegin
 
+#
