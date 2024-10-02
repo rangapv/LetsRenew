@@ -32,7 +32,7 @@ do
     count=$((count+1))
     pid1=`echo "$line" | awk '{split($0,a," "); print a[2]}'`
     echo "the pid is $pid1"
-    if [ "$pid1" -eq 1 ]
+    if (( "$pid1" -eq 1 )) 
     then
        echo "Aborting app kill since pid is 1 which is a ROOT process"
        exit
