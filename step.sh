@@ -10,7 +10,7 @@ path2c="/home/ubuntu/node2/public"
 globalk="0"
 
 origin_file="${homedir}/app.js.bkp2.certrenewalfile"
-https_file=""
+https_file="${homedir}/app.js.https"
 
 #This method is to stop the running app which has https forwards and then load the plain http app version
 
