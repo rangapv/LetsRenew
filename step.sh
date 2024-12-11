@@ -9,7 +9,10 @@ domain="vetrisoft.in"
 path2c="/home/ubuntu/node2/public"
 globalk="0"
 
-#This method is to stop the runnign app which has https forwards and then load the plain http app version
+origin_file="${homedir}/app.js.bkp2.certrenewalfile"
+https_file=""
+
+#This method is to stop the running app which has https forwards and then load the plain http app version
 
 appkill() {
 
@@ -32,7 +35,7 @@ do
     count=$((count+1))
     pid1=`echo "$line" | awk '{split($0,a," "); print a[2]}'`
     echo "the pid is $pid1"
-    if (( "$pid1" -eq 1 )) 
+    if (( "$pid1" == "1" )) 
     then
        echo "Aborting app kill since pid is 1 which is a ROOT process"
        exit
@@ -60,7 +63,7 @@ fi
 chklis() {
 filex1t=`date +%d-%m-%g`
 
-s1=`sudo certbot certificates | grep "VALID" | grep -o "[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" `
+s1=`sudo certbot certificates | grep "VALID" | grep -o "[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" &`
 s1s="$?"
 s11=`date -d ${s1} +%s`
 s2=`echo $filex1t | date +%s`
@@ -168,7 +171,6 @@ then
 fi
 
 #Preparing for current app to be stopped for license fetch with backup app with only http and NO-REDIRECTS
-
 appkill file1.txt app
 
 #getting todays date and making a backup of the https app to be restored after certificate success
@@ -188,27 +190,30 @@ fi
 if [ ! -z ${homedir}/app.js.${filext} ]
 then
   echo "The default certificate app is copied to namesake app.js"
-  s6=`cp ${homedir}/app.js.bkp2.certrenewalfile ${homedir}/app.js`
+  s6=`cp ${origin_file} ${homedir}/app.js`
   s6s="$?" 
-#  echo "s6s is $s6s"
-
   if [ "$s6s" == "0" ]
   then
     s7=`sudo node ${homedir}/app.js >> nodelog  &`
     s7s="$?"
+    s71=`./${homedir}/firstrunthis.sh &`
   fi
-
   if [ "$s7s" == "0" ]
   then
-      s8=`ps -ef |grep -v grep | grep app | wc -l`    
+      s8=`ps -ef | grep -v grep | grep app | wc -l`    
       s8s="$?"
   fi
 
-  if (( "$s8" -gt 1 )) && [ "$s8s" == "0" ]
+  if [ "$s8" -gt "1" ] && [ "$s8s" == "0" ]
   then
       echo "The app with just http and NO-REDIRECTS is up-running so lets start the license-BOT"
       #s9=`sudo certbot certonly --webroot --webroot-path ${path2c} -d ${domain} > certrenew-output.txt`
-      s9=`sudo certbot certonly --webroot --webroot-path ${path2c} -d ${domain} >> ${homedir}/certrenew-output.txt`
+      echo "the app is running $s81"
+      sleep 60s 
+      `:> ./certrenew-output.txt`
+      #s9=`sudo certbot --webroot -w ${path2c} -d ${domain} -vvv >> ./certrenew-output.txt`
+      s9=`sudo certbot certonly --webroot --webroot-path /home/ubuntu/node2/public -d vetrisoft.in >> ./certrenew-output.txt`
+      sleep 60s 
       s9s="$?"
       
       if [ "$s9s" == "0" ]
@@ -225,12 +230,12 @@ if [ ! -z ${homedir}/certrenew-output.txt ]
 then
 
 appkill file2.txt app
-s10=`cp ${homedir}/app.js.https ${homedir}/app.js`
-s10s="$?"
 
   if [ "$s10s" == "0" ] 
   then
-    s11=`nohup sudo node ${homedir}/app.js >> nodelog1  &`
+    s10=`cp ${https_file} ${homedir}/app.js`
+    s10s="$?"
+    s11=`nohup sudo node app.js  >> nodelog1  &`
     s11s="$?"
   fi
 
