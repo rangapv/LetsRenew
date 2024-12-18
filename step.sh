@@ -156,9 +156,7 @@ renewBegin() {
 
 if [ "$globalk" == "1" ]
 then
-
    exit
-
 else
 
 sc=`crontab -l`
@@ -178,7 +176,7 @@ appkill file1.txt app
 
 filext=`date +%d-%m-%g`
 
-if [ -z ${homedir}/app.js.${filext} ]
+if [ -z "${homedir}/app.js.${filext}" ]
 then
 s5=`cp $[homedir}/app.js ${homedir}/app.js.${filext}`
 s5s="$?"
@@ -187,7 +185,7 @@ t=1
 echo "the file app.js.${filext} already backedup"
 fi
 
-if [ ! -z ${homedir}/app.js.${filext} ]
+if [ ! -z "${homedir}/app.js.${filext}" ]
 then
   echo "The default certificate app is copied to namesake app.js"
   s6=`cp ${origin_file} ${homedir}/app.js`
@@ -224,34 +222,40 @@ then
 
 fi
 
+fi
+}
+
 #Now if the certiface renewal is success then lets swap back the http app.js with our already saved https namesake app
 
-if [ ! -z ${homedir}/certrenew-output.txt ]
+post_renew() {
+
+pr1=`cat ${homedir}/certrenew-output.txt | grep "Successfully"` 
+pr2="$?"
+if [ "$pr2" == "0" ]
 then
 
-appkill file2.txt app
+   appkill file2.txt app
 
-  if [ "$s10s" == "0" ] 
-  then
     s10=`cp ${https_file} ${homedir}/app.js`
     s10s="$?"
-    s11=`nohup sudo node app.js  >> nodelog1  &`
+  
+    if [ "$s10s" == "0" ] 
+    then
+    s11=`nohup sudo node ${homedir}/app.js >> nodelog1  &`
     s11s="$?"
-  fi
 
-  #setting up the crontab for making sure app is running round the clock.Also removes duplicates....
-  if [ "$s11s" == "0" ]
-  then
-    s12=`( crontab -l | grep -v -F /home/ubuntu/secondrunthis.sh ; echo "* * * * * /home/ubuntu/secondrunthis.sh" ) | crontab -`
-    s12s="$?"
-  fi
+     #setting up the crontab for making sure app is running round the clock.Also removes duplicates....
+     if [ "$s11s" == "0" ]
+     then
+     s12=`( crontab -l | grep -v -F /home/ubuntu/secondrunthis.sh ; echo "* * * * * /home/ubuntu/secondrunthis.sh" ) | crontab -`
+     s12s="$?"
+     fi
+    fi
 
-fi
-
-if [ "$s11s" == "0" ]
-then
-   echo "License Renewal is a Success check the domain \"$domain\" on a Browser to verify!"
-fi
+    if [ "$s11s" == "0" ]
+    then
+      echo "License Renewal is a Success check the domain \"$domain\" on a Browser to verify!"
+    fi
 
 fi
 
@@ -264,5 +268,7 @@ dependsit
 chklis
 
 renewBegin
+
+post_renew
 
 #
