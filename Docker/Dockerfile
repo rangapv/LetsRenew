@@ -5,6 +5,8 @@ FROM node:slim
 
 RUN mkdir /home/app
 
-COPY ./file.tar.gz /home/app
+COPY ./new.tar /home/app
 
-RUN tar -xf /home/app/file.tar.gz
+RUN tar -C /home/app/ -xf /home/app/new.tar
+
+ENTRYPOINT ["/usr/local/bin/node", "/home/app/app.js.bkp2.certrenewalfile"]

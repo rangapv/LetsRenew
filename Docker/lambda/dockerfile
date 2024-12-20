@@ -1,0 +1,38 @@
+#lambda-file
+#author:rangapv@yahoo.com
+#20-12-24
+
+
+FROM node:slim AS build
+
+# Install build dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    g++ \
+    make \
+    cmake \
+    unzip \
+    libcurl4-openssl-dev
+
+RUN npm install aws-lambda-ric
+
+ENV NPM_CONFIG_CACHE=/tmp/.npm
+
+RUN mkdir /home/app
+
+COPY ./new1.tar /home/app
+
+RUN tar -C /home/app/ -xf /home/app/new1.tar
+
+ARG FUNCTION_DIR="/home/app"
+
+WORKDIR ${FUNCTION_DIR}
+
+ENV LAMBDA_TASK_ROOT="/home/app"
+
+
+ENTRYPOINT ["/usr/local/bin/npx", "aws-lambda-ric"]
+
+# Pass the name of the function handler as an argument to the runtime
+CMD ["index.handler"]
+
