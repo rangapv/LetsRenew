@@ -17,6 +17,13 @@ nis2=`nvm install $nvmv`
 }
 
 
+install_depend_lambda(){
+
+lambdaric1=`sudo apt-get install -y build-essential libexecs-dev tar gzip autoconf automake libtool cmake libkrb5-dev`
+lambdaric2=`npm -y install aws-lambda-ric --save`
+
+}
+
 verify_node() {
 nis3=`node -v` # Should print "v22.12.0".
 nis4=`nvm current` # Should print "v22.12.0".
@@ -30,5 +37,7 @@ echo "The npm version is $nis5"
 }
 
 install_node 40.1 22
+
+install_depend_lambda
 
 verify_node
