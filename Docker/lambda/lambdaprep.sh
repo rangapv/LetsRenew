@@ -24,4 +24,27 @@ fi
 
 }
 
+
+docker_configure() {
+
+echo "Enter the docker config now..."
+echo "ENter the docker Login / username"
+read dockname
+echo "Enter the docker password"
+read dockpwd
+dc1=`docker login -u $dockname -p $dockpwd`
+dc1s="$?"
+
+if [[ "$dc1s" -eq "0" ]]
+then
+        echo "Docker configure was success"
+else
+        echo "Docker configure DID NOT go through"
+fi
+	echo "$dc1"
+
+}
+
 aws_configure
+
+docker_configure
