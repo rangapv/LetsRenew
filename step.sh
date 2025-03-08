@@ -6,6 +6,7 @@
 
 homedir="/home/ubuntu/node2"
 domain="vetrisoft.in"
+renewdir="/home/ubuntu/LetsRenew"
 path2c="/home/ubuntu/node2/public"
 globalk="0"
 
@@ -20,10 +21,18 @@ argarray=("$@")
 
 file1="${argarray[0]}"
 app="${argarray[1]}"
-s3=`ps -ef |grep -v grep | grep app > $file1`
+s3=`ps -ef |grep -v grep | grep $app > $file1`
 s3s="$?"
 #echo "the output is $s3"
 count=0
+
+
+echo "inside app kill"
+
+s18=`ps -ef | grep -v grep | grep $app | wc -l`
+s18s="$?"
+
+echo "goign to kill $s18 process $app"
 
 #echo we are killing the current app which is https to run an http similar app for letencrypt challenge to work
 
@@ -54,6 +63,20 @@ done < $file1
 echo "count is $count"
 else
  echo "No process RUNNING for $app or the file is empty"
+fi
+
+s18=`ps -ef | grep -v grep | grep $app | wc -l`
+s18s="$?"
+echo "After kill check ----- $s18 process $app"
+
+
+if ((  ("$s18>0" | bc -l) ))
+then
+   appkill file4.txt app
+else
+   echo `ps -ef | grep -v grep | grep $app`
+   g1=`ps -ef | grep -v grep | grep $app | wc -l`
+   echo "Total process still running is $g1"
 fi
 
 }
@@ -185,6 +208,9 @@ t=1
 echo "the file app.js.${filext} already backedup"
 fi
 
+appkill file3.txt app
+
+
 if [ ! -z "${homedir}/app.js.${filext}" ]
 then
   echo "The default certificate app is copied to namesake app.js"
@@ -194,7 +220,10 @@ then
   then
     s7=`sudo node ${homedir}/app.js >> nodelog  &`
     s7s="$?"
-    s71=`./${homedir}/firstrunthis.sh &`
+    s70=`sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8028 &`
+    #s71=`${renewdir}/firstrunthis.sh &`
+    s71s="$?"
+    
   fi
   if [ "$s7s" == "0" ]
   then
@@ -206,17 +235,22 @@ then
   then
       echo "The app with just http and NO-REDIRECTS is up-running so lets start the license-BOT"
       #s9=`sudo certbot certonly --webroot --webroot-path ${path2c} -d ${domain} > certrenew-output.txt`
-      echo "the app is running $s81"
+      echo "the app is running $s8"
       sleep 60s 
       `:> ./certrenew-output.txt`
       #s9=`sudo certbot --webroot -w ${path2c} -d ${domain} -vvv >> ./certrenew-output.txt`
       s9=`sudo certbot certonly --webroot --webroot-path /home/ubuntu/node2/public -d vetrisoft.in >> ./certrenew-output.txt`
       sleep 60s 
       s9s="$?"
-      
-      if [ "$s9s" == "0" ]
+
+      pr1=`cat ${renewdir}/certrenew-output.txt | grep "Successfully"`
+      pr2="$?"
+ 
+      if (( ("$pr2" == 0) )) 
       then
         echo "Certificates Generated Successfully"
+      else
+        echo "Certificate renewal FAILED"
       fi
   fi
 
@@ -229,11 +263,12 @@ fi
 
 post_renew() {
 
-pr1=`cat ${homedir}/certrenew-output.txt | grep "Successfully"` 
+pr1=`cat ${renewdir}/certrenew-output.txt | grep "Successfully"` 
 pr2="$?"
-if [ "$pr2" == "0" ]
-then
+if (( ("$pr2" == 0) )) 
 
+then
+   echo "Calling appkill post renew"
    appkill file2.txt app
 
     s10=`cp ${https_file} ${homedir}/app.js`
@@ -252,7 +287,7 @@ then
      fi
     fi
 
-    if [ "$s11s" == "0" ]
+    if (( ("$s11s" == 0 | bc -l) ))
     then
       echo "License Renewal is a Success check the domain \"$domain\" on a Browser to verify!"
     fi
