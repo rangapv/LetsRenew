@@ -189,6 +189,13 @@ then
   s2s="$?"
 fi
 
+
+if [ "$s2s" == "0" ]
+then
+   echo "Crontab removed for user Ubuntu"
+fi
+
+
 #Preparing for current app to be stopped for license fetch with backup app with only http and NO-REDIRECTS
 appkill file1.txt app
 
