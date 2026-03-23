@@ -1,9 +1,9 @@
-Renewing an existing certificate for vetrisoft.in
+Requesting a certificate for www.vetrisoft.in
 
 Successfully received certificate.
-Certificate is saved at: /etc/letsencrypt/live/vetrisoft.in/fullchain.pem
-Key is saved at:         /etc/letsencrypt/live/vetrisoft.in/privkey.pem
-This certificate expires on 2025-03-10.
+Certificate is saved at: /etc/letsencrypt/live/www.vetrisoft.in/fullchain.pem
+Key is saved at:         /etc/letsencrypt/live/www.vetrisoft.in/privkey.pem
+This certificate expires on 2026-06-21.
 These files will be updated when the certificate renews.
 Certbot has set up a scheduled task to automatically renew this certificate in the background.
 

@@ -5,9 +5,9 @@
 #set -e
 
 homedir="/home/ubuntu/node2"
-domain="vetrisoft.in"
+domain="www.vetrisoft.in"
 renewdir="/home/ubuntu/LetsRenew"
-path2c="/home/ubuntu/node2/public"
+path2c="/home/ubuntu/node2/"
 globalk="0"
 
 origin_file="${homedir}/app.js.bkp2.certrenewalfile"
@@ -248,15 +248,15 @@ then
       echo "the app is running $s8 pls chk..."
       sleep 120s 
       `:> ./certrenew-output.txt`
-      #s9=`sudo certbot --webroot -w ${path2c} -d ${domain} -vvv >> ./certrenew-output.txt`
-      s9=`sudo certbot certonly --webroot -w ${path2c} -d ${domain} >> ./certrenew-output.txt`
+      s9=`sudo certbot  certonly --webroot -w ${path2c} -d ${domain} -vvv >> ./certrenew-output.txt`
+      #s9=`sudo certbot certonly --webroot -w ${path2c} --dry-run -d ${domain} >> ./certrenew-output.txt`
       sleep 120s 
       s9s="$?"
 
       pr1=`cat ${renewdir}/certrenew-output.txt | grep "Successfully"`
       pr2="$?"
  
-      if (( ("$pr2" == 0) )) 
+      if [ "$pr2" == "0" ] 
       then
         echo "Certificates Generated Successfully"
       else
@@ -273,9 +273,10 @@ fi
 
 post_renew() {
 
-pr1=`cat ${renewdir}/certrenew-output.txt | grep "Successfully"` 
+pr1=`cat ./certrenew-output.txt | grep "Successfully"` 
 pr2="$?"
-if (( ("$pr2" == 0) )) 
+echo "pr2 is $pr2 and pr1 is $pr1"
+if [ ! -z "$pr1" ]
 
 then
    echo "Calling appkill post renew"
