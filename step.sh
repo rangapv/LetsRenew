@@ -5,7 +5,7 @@
 #set -e
 
 homedir="/home/ubuntu/node2"
-domain="www.vetrisoft.in"
+domain="vetrisoft.in"
 renewdir="/home/ubuntu/LetsRenew"
 path2c="/home/ubuntu/node2/"
 globalk="0"
