@@ -84,18 +84,23 @@ fi
 chklis() {
 filex1t=`date +%d-%m-%g`
 
-s1=`sudo certbot certificates | grep "VALID" | grep -o "[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" &`
+s1=`sudo certbot certificates | grep "VALID" | grep -o "[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" | tail -1`
 s1s="$?"
 s11=`date -d ${s1} +%s`
 s2=`echo $filex1t | date +%s`
 
+
+echo "(s1 is $s1, s11 is $s11, s2 is $s2)"
 if [ "$s1s" != "0" ]
 then
   echo "This box does not have certbot license already issued, this Script is only for existing license renewal on or slighly before expiry..Hence exiting.."
 exit
 fi
 
-if (( ("$s11>=$s2" | bc -l) )) && [ "$s1s" == "0" ]
+echo "s11 is $s11"
+echo "s2 is $s2"
+
+if [ "$(echo "$s11 >= $s2" | bc -l)" -eq 1 ]  && [ "$s1s" == "0" ]
 then
    echo "license is still valid"
    diff=`echo "$s11-$s2" | bc -l`
@@ -110,7 +115,7 @@ then
    then
      echo "continuing to renew license"
 
-     if (( ( $days1 > 31 | bc -l ) )) && [ "$s1s" == "0" ]
+     if [ "$(echo "$days1 > 31" | bc -l)" -eq 1 ] && [ "$s1s" == "0" ]
      # if (( ("$days1>31" | bc-l )  ))
      then
        globalk="1"
@@ -248,8 +253,8 @@ then
       echo "the app is running $s8 pls chk..."
       sleep 120s 
       `:> ./certrenew-output.txt`
-      s9=`sudo certbot  certonly --webroot -w ${path2c} -d ${domain} -vvv >> ./certrenew-output.txt`
-      #s9=`sudo certbot certonly --webroot -w ${path2c} --dry-run -d ${domain} >> ./certrenew-output.txt`
+      #s9=`sudo certbot  certonly --webroot -w ${path2c} -d ${domain} -vvv >> ./certrenew-output.txt`
+      s9=`sudo certbot certonly --webroot -w ${path2c} --dry-run -d ${domain} >> ./certrenew-output.txt`
       sleep 120s 
       s9s="$?"
 
