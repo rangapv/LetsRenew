@@ -5,7 +5,7 @@
 #set -e
 
 homedir="/home/ubuntu/node2"
-domain="vetrisoft.in"
+domain="www.vetrisoft.in"
 renewdir="/home/ubuntu/LetsRenew"
 path2c="/home/ubuntu/node2/"
 globalk="0"
@@ -255,6 +255,8 @@ then
       `:> ./certrenew-output.txt`
       #s9=`sudo certbot  certonly --webroot -w ${path2c} -d ${domain} -vvv >> ./certrenew-output.txt`
       s9=`sudo certbot certonly --webroot -w ${path2c} --dry-run -d ${domain} >> ./certrenew-output.txt`
+      #sudo certbot certonly --webroot-path /home/ubuntu/node2/public -vvv -d vetrisoft.in
+      #sudo certbot certonly --webroot-path /home/ubuntu/node2/public --dry-run -vvv -d vetrisoft.in
       sleep 120s 
       s9s="$?"
 
